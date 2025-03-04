@@ -173,5 +173,28 @@ namespace HelloGreetingApplication.Controllers
             return Ok(responseModel);
         }
 
+        /// <summary>
+        /// Get a personalized greeting message
+        /// </summary>
+        /// <param name="requestModel">Request model containing user details</param>
+        /// <returns>Personalized greeting message</returns>
+        [HttpPost("personalizedGreeting")]
+
+        public IActionResult GetPersonalizedGreeting([FromBody] RequestModel requestModel)
+        {
+            _logger.LogInformation($"POST request received at /hellogreeting/greetPersonalized for key: {requestModel.key}");
+
+            string message = _greetingBL.PersonalizedGreeting(requestModel);
+
+            _logger.LogInformation($"Personalized greeting generated: {message}");
+
+            return Ok(new ResponseModel<string>
+            {
+                Success = true,
+                Message = "Personalized greeting retrieved successfully",
+                Data = message
+            });
+        }
+
     }
 }
