@@ -1,0 +1,12 @@
+D:\AVS\BridgeLabz\HelloGreetingApplication\ModelLayer\bin\Debug\net6.0\ModelLayer.deps.json
+D:\AVS\BridgeLabz\HelloGreetingApplication\ModelLayer\bin\Debug\net6.0\ModelLayer.dll
+D:\AVS\BridgeLabz\HelloGreetingApplication\ModelLayer\bin\Debug\net6.0\ModelLayer.pdb
+D:\AVS\BridgeLabz\HelloGreetingApplication\ModelLayer\obj\Debug\net6.0\ModelLayer.csproj.AssemblyReference.cache
+D:\AVS\BridgeLabz\HelloGreetingApplication\ModelLayer\obj\Debug\net6.0\ModelLayer.GeneratedMSBuildEditorConfig.editorconfig
+D:\AVS\BridgeLabz\HelloGreetingApplication\ModelLayer\obj\Debug\net6.0\ModelLayer.AssemblyInfoInputs.cache
+D:\AVS\BridgeLabz\HelloGreetingApplication\ModelLayer\obj\Debug\net6.0\ModelLayer.AssemblyInfo.cs
+D:\AVS\BridgeLabz\HelloGreetingApplication\ModelLayer\obj\Debug\net6.0\ModelLayer.csproj.CoreCompileInputs.cache
+D:\AVS\BridgeLabz\HelloGreetingApplication\ModelLayer\obj\Debug\net6.0\ModelLayer.dll
+D:\AVS\BridgeLabz\HelloGreetingApplication\ModelLayer\obj\Debug\net6.0\refint\ModelLayer.dll
+D:\AVS\BridgeLabz\HelloGreetingApplication\ModelLayer\obj\Debug\net6.0\ModelLayer.pdb
+D:\AVS\BridgeLabz\HelloGreetingApplication\ModelLayer\obj\Debug\net6.0\ref\ModelLayer.dll
