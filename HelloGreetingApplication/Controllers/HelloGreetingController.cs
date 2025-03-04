@@ -1,3 +1,4 @@
+using BusinessLayer.Interface;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModelLayer.Model;
@@ -14,10 +15,12 @@ namespace HelloGreetingApplication.Controllers
     {
         private readonly ILogger<HelloGreetingController> _logger;
         private static Dictionary<string, string> keyValueStore = new Dictionary<string, string>();
+        private readonly IGreetingBL _greetingBL;
 
-        public HelloGreetingController(ILogger<HelloGreetingController> logger)
+        public HelloGreetingController(ILogger<HelloGreetingController> logger, IGreetingBL greetingBL)
         {
             _logger = logger;
+            _greetingBL = greetingBL;
         }
 
         /// <summary>
@@ -148,5 +151,27 @@ namespace HelloGreetingApplication.Controllers
                 Message = "Key not found"
             });
         }
+
+        /// <summary>
+        /// Get a greeting message using business layer
+        /// </summary>
+        /// <returns>Greeting Message</returns>
+        [HttpGet("greet")]
+        public IActionResult GetGreeting()
+        {
+            _logger.LogInformation("GET request received at /hellogreeting/greet");
+
+            string greetingMessage = _greetingBL.GetGreeting();
+
+            ResponseModel<string> responseModel = new ResponseModel<string>
+            {
+                Success = true,
+                Message = "Greeting message retrieved successfully",
+                Data = greetingMessage
+            };
+
+            return Ok(responseModel);
+        }
+
     }
 }

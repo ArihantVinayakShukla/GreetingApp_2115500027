@@ -1,3 +1,5 @@
+using BusinessLayer.Interface;
+using BusinessLayer.Service;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -15,6 +17,7 @@ try
     builder.Logging.ClearProviders(); // Remove default logging providers
     builder.Host.UseNLog(); // Use NLog
 
+    builder.Services.AddScoped<IGreetingBL, GreetingBL>();
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();

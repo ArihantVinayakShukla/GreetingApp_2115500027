@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\AVS\\BridgeLabz\\HelloGreetingApplication\\ModelLayer\\ModelLayer.csproj": {}
+    "D:\\AVS\\BridgeLabz\\GreetingApp_2115500027\\ModelLayer\\ModelLayer.csproj": {}
   },
   "projects": {
-    "D:\\AVS\\BridgeLabz\\HelloGreetingApplication\\ModelLayer\\ModelLayer.csproj": {
+    "D:\\AVS\\BridgeLabz\\GreetingApp_2115500027\\ModelLayer\\ModelLayer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\AVS\\BridgeLabz\\HelloGreetingApplication\\ModelLayer\\ModelLayer.csproj",
+        "projectUniqueName": "D:\\AVS\\BridgeLabz\\GreetingApp_2115500027\\ModelLayer\\ModelLayer.csproj",
         "projectName": "ModelLayer",
-        "projectPath": "D:\\AVS\\BridgeLabz\\HelloGreetingApplication\\ModelLayer\\ModelLayer.csproj",
+        "projectPath": "D:\\AVS\\BridgeLabz\\GreetingApp_2115500027\\ModelLayer\\ModelLayer.csproj",
         "packagesPath": "C:\\Users\\shukl\\.nuget\\packages\\",
-        "outputPath": "D:\\AVS\\BridgeLabz\\HelloGreetingApplication\\ModelLayer\\obj\\",
+        "outputPath": "D:\\AVS\\BridgeLabz\\GreetingApp_2115500027\\ModelLayer\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

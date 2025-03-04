@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\AVS\\BridgeLabz\\HelloGreetingApplication\\BusinessLayer\\BusinessLayer.csproj": {}
+    "D:\\AVS\\BridgeLabz\\GreetingApp_2115500027\\BusinessLayer\\BusinessLayer.csproj": {}
   },
   "projects": {
-    "D:\\AVS\\BridgeLabz\\HelloGreetingApplication\\BusinessLayer\\BusinessLayer.csproj": {
+    "D:\\AVS\\BridgeLabz\\GreetingApp_2115500027\\BusinessLayer\\BusinessLayer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\AVS\\BridgeLabz\\HelloGreetingApplication\\BusinessLayer\\BusinessLayer.csproj",
+        "projectUniqueName": "D:\\AVS\\BridgeLabz\\GreetingApp_2115500027\\BusinessLayer\\BusinessLayer.csproj",
         "projectName": "BusinessLayer",
-        "projectPath": "D:\\AVS\\BridgeLabz\\HelloGreetingApplication\\BusinessLayer\\BusinessLayer.csproj",
+        "projectPath": "D:\\AVS\\BridgeLabz\\GreetingApp_2115500027\\BusinessLayer\\BusinessLayer.csproj",
         "packagesPath": "C:\\Users\\shukl\\.nuget\\packages\\",
-        "outputPath": "D:\\AVS\\BridgeLabz\\HelloGreetingApplication\\BusinessLayer\\obj\\",
+        "outputPath": "D:\\AVS\\BridgeLabz\\GreetingApp_2115500027\\BusinessLayer\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -32,8 +32,8 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "D:\\AVS\\BridgeLabz\\HelloGreetingApplication\\RepositoryLayer\\RepositoryLayer.csproj": {
-                "projectPath": "D:\\AVS\\BridgeLabz\\HelloGreetingApplication\\RepositoryLayer\\RepositoryLayer.csproj"
+              "D:\\AVS\\BridgeLabz\\GreetingApp_2115500027\\RepositoryLayer\\RepositoryLayer.csproj": {
+                "projectPath": "D:\\AVS\\BridgeLabz\\GreetingApp_2115500027\\RepositoryLayer\\RepositoryLayer.csproj"
               }
             }
           }
@@ -83,14 +83,14 @@
         }
       }
     },
-    "D:\\AVS\\BridgeLabz\\HelloGreetingApplication\\ModelLayer\\ModelLayer.csproj": {
+    "D:\\AVS\\BridgeLabz\\GreetingApp_2115500027\\ModelLayer\\ModelLayer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\AVS\\BridgeLabz\\HelloGreetingApplication\\ModelLayer\\ModelLayer.csproj",
+        "projectUniqueName": "D:\\AVS\\BridgeLabz\\GreetingApp_2115500027\\ModelLayer\\ModelLayer.csproj",
         "projectName": "ModelLayer",
-        "projectPath": "D:\\AVS\\BridgeLabz\\HelloGreetingApplication\\ModelLayer\\ModelLayer.csproj",
+        "projectPath": "D:\\AVS\\BridgeLabz\\GreetingApp_2115500027\\ModelLayer\\ModelLayer.csproj",
         "packagesPath": "C:\\Users\\shukl\\.nuget\\packages\\",
-        "outputPath": "D:\\AVS\\BridgeLabz\\HelloGreetingApplication\\ModelLayer\\obj\\",
+        "outputPath": "D:\\AVS\\BridgeLabz\\GreetingApp_2115500027\\ModelLayer\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -158,14 +158,14 @@
         }
       }
     },
-    "D:\\AVS\\BridgeLabz\\HelloGreetingApplication\\RepositoryLayer\\RepositoryLayer.csproj": {
+    "D:\\AVS\\BridgeLabz\\GreetingApp_2115500027\\RepositoryLayer\\RepositoryLayer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\AVS\\BridgeLabz\\HelloGreetingApplication\\RepositoryLayer\\RepositoryLayer.csproj",
+        "projectUniqueName": "D:\\AVS\\BridgeLabz\\GreetingApp_2115500027\\RepositoryLayer\\RepositoryLayer.csproj",
         "projectName": "RepositoryLayer",
-        "projectPath": "D:\\AVS\\BridgeLabz\\HelloGreetingApplication\\RepositoryLayer\\RepositoryLayer.csproj",
+        "projectPath": "D:\\AVS\\BridgeLabz\\GreetingApp_2115500027\\RepositoryLayer\\RepositoryLayer.csproj",
         "packagesPath": "C:\\Users\\shukl\\.nuget\\packages\\",
-        "outputPath": "D:\\AVS\\BridgeLabz\\HelloGreetingApplication\\RepositoryLayer\\obj\\",
+        "outputPath": "D:\\AVS\\BridgeLabz\\GreetingApp_2115500027\\RepositoryLayer\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -186,8 +186,8 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "D:\\AVS\\BridgeLabz\\HelloGreetingApplication\\ModelLayer\\ModelLayer.csproj": {
-                "projectPath": "D:\\AVS\\BridgeLabz\\HelloGreetingApplication\\ModelLayer\\ModelLayer.csproj"
+              "D:\\AVS\\BridgeLabz\\GreetingApp_2115500027\\ModelLayer\\ModelLayer.csproj": {
+                "projectPath": "D:\\AVS\\BridgeLabz\\GreetingApp_2115500027\\ModelLayer\\ModelLayer.csproj"
               }
             }
           }
