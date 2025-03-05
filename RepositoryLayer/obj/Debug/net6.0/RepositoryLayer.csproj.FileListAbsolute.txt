@@ -29,3 +29,5 @@ D:\AVS\BridgeLabz\GreetingApp_2115500027\RepositoryLayer\obj\Debug\net6.0\Reposi
 D:\AVS\BridgeLabz\GreetingApp_2115500027\RepositoryLayer\obj\Debug\net6.0\refint\RepositoryLayer.dll
 D:\AVS\BridgeLabz\GreetingApp_2115500027\RepositoryLayer\obj\Debug\net6.0\RepositoryLayer.pdb
 D:\AVS\BridgeLabz\GreetingApp_2115500027\RepositoryLayer\obj\Debug\net6.0\ref\RepositoryLayer.dll
+D:\AVS\BridgeLabz\GreetingApp_2115500027\RepositoryLayer\bin\Debug\net6.0\RepositoryLayer.runtimeconfig.json
+D:\AVS\BridgeLabz\GreetingApp_2115500027\RepositoryLayer\obj\Debug\net6.0\RepositoryLayer.genruntimeconfig.cache
