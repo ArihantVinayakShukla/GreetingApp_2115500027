@@ -65,5 +65,27 @@ namespace RepositoryLayer.Service
                 throw;
             }
         }
+
+        public GreetingEntity GetGreetingsById(int id)
+        {
+            try
+            {
+                _logger.LogInformation($"Fetching greeting with ID: {id}");
+                var greeting = _context.Greetings.FirstOrDefault(g => g.Id == id);
+
+                if (greeting == null)
+                {
+                    _logger.LogWarning($"Greeting with ID {id} not found.");
+                }
+
+                return greeting;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"An error occurred while fetching greeting with ID {id}: {ex.Message}");
+                throw;
+            }
+        }
+
     }
 }

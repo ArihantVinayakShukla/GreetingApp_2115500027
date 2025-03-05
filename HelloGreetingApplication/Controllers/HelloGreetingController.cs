@@ -1,5 +1,6 @@
 using BusinessLayer.Interface;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ModelLayer.Model;
 using RepositoryLayer.Entity;
@@ -240,6 +241,50 @@ namespace HelloGreetingApplication.Controllers
                 });
             }
         }
+
+        /// <summary>
+        /// Fetch greetings by id
+        /// </summary>
+        /// <param name="id">Id of the greeting message</param>
+        /// <returns>greeting message with the corresponding id</returns>
+        [HttpGet("{id}")]
+        public IActionResult GetGreetingsById(int id)
+        {
+            _logger.LogInformation($"GET request received for greeting ID: {id}");
+
+            try
+            {
+                var greeting = _greetingBL.GetGreetingsById(id);
+
+                if (greeting == null)
+                {
+                    _logger.LogWarning($"Greeting with ID {id} not found.");
+                    return NotFound(new ResponseModel<string>
+                    {
+                        Success = false,
+                        Message = $"Greeting with ID {id} not found."
+                    });
+                }
+
+                _logger.LogInformation($"Greeting with ID {id} retrieved successfully.");
+                return Ok(new ResponseModel<GreetingEntity>
+                {
+                    Success = true,
+                    Message = "Greeting retrieved successfully.",
+                    Data = greeting
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error retrieving greeting with ID {id}: {ex.Message}");
+                return StatusCode(500, new ResponseModel<string>
+                {
+                    Success = false,
+                    Message = "An error occurred while retrieving the greeting."
+                });
+            }
+        }
+
 
     }
 }
