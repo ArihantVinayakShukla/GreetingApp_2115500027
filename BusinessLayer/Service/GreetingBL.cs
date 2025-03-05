@@ -82,5 +82,22 @@ namespace BusinessLayer.Service
             }
         }
 
+        public List<GreetingEntity> GetAllGreetings()
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all greetings from the repository.");
+                List<GreetingEntity> greetings = _greetingRL.GetAllGreetings();
+                _logger.LogInformation($"Successfully retrieved {greetings.Count} greetings.");
+                return greetings;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error while retrieving all greetings: {ex.Message}");
+                throw; // Rethrow the exception to let the Controller handle it
+            }
+        }
+
+
     }
 }
