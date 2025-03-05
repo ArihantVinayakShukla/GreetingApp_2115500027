@@ -112,5 +112,32 @@ namespace RepositoryLayer.Service
             }
         }
 
+        public GreetingEntity EditGreetings(int id, string message)
+        {
+            try
+            {
+                _logger.LogInformation($"Attempting to edit greeting with ID: {id}");
+
+                var greeting = _context.Greetings.FirstOrDefault(g => g.Id == id);
+                if (greeting != null)
+                {
+                    greeting.Message = message;
+                    _context.SaveChanges();
+                    _logger.LogInformation($"Greeting with ID: {id} updated successfully.");
+                }
+                else
+                {
+                    _logger.LogWarning($"Greeting with ID: {id} not found.");
+                }
+
+                return greeting;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"An error occurred while editing greeting with ID {id}: {ex.Message}");
+                throw;
+            }
+        }
+
     }
 }

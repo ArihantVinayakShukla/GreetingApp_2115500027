@@ -327,6 +327,51 @@ namespace HelloGreetingApplication.Controllers
             }
         }
 
+        /// <summary>
+        /// fetch the greeting by id and modify it
+        /// </summary>
+        /// <param name="id">Id of th greeting message</param>
+        /// <param name="message">Modified greeting</param>
+        /// <returns>The edited greeting</returns>
+        [HttpPut("edit/{id}")]
+        public IActionResult EditGreetings(int id, [FromBody] string message)
+        {
+            _logger.LogInformation($"PUT request received to edit greeting with ID: {id}");
+
+            try
+            {
+                var updatedGreeting = _greetingBL.EditGreetings(id, message);
+
+                if (updatedGreeting == null)
+                {
+                    _logger.LogWarning($"Greeting with ID {id} not found.");
+                    return NotFound(new ResponseModel<string>
+                    {
+                        Success = false,
+                        Message = $"Greeting with ID {id} not found."
+                    });
+                }
+
+                _logger.LogInformation($"Greeting with ID {id} updated successfully.");
+                return Ok(new ResponseModel<GreetingEntity>
+                {
+                    Success = true,
+                    Message = "Greeting updated successfully.",
+                    Data = updatedGreeting
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error updating greeting with ID {id}: {ex.Message}");
+                return StatusCode(500, new ResponseModel<string>
+                {
+                    Success = false,
+                    Message = "An error occurred while updating the greeting."
+                });
+            }
+        }
+
+
 
     }
 }

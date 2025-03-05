@@ -78,7 +78,7 @@ namespace BusinessLayer.Service
             catch (Exception ex)
             {
                 _logger.LogError($"Error in Business Layer while fetching greeting ID {id}: {ex.Message}");
-                throw; // Rethrow the exception to let the Controller handle it
+                throw; 
             }
         }
 
@@ -94,7 +94,33 @@ namespace BusinessLayer.Service
             catch (Exception ex)
             {
                 _logger.LogError($"Error while retrieving all greetings: {ex.Message}");
-                throw; // Rethrow the exception to let the Controller handle it
+                throw; 
+            }
+        }
+
+        public GreetingEntity EditGreetings(int id, string message)
+        {
+            try
+            {
+                _logger.LogInformation($"Attempting to edit greeting with ID: {id}");
+
+                GreetingEntity updatedGreeting = _greetingRL.EditGreetings(id, message);
+
+                if (updatedGreeting != null)
+                {
+                    _logger.LogInformation($"Greeting with ID: {id} updated successfully.");
+                }
+                else
+                {
+                    _logger.LogWarning($"Greeting with ID: {id} not found.");
+                }
+
+                return updatedGreeting;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error while editing greeting ID {id}: {ex.Message}");
+                throw;
             }
         }
 
