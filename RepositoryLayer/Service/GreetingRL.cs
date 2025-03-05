@@ -139,5 +139,30 @@ namespace RepositoryLayer.Service
             }
         }
 
+        public bool DeleteGreetingMessage(int id)
+        {
+            try
+            {
+                _logger.LogInformation($"Attempting to delete greeting with ID: {id}");
+                var greeting = _context.Greetings.FirstOrDefault(g => g.Id == id);
+
+                if (greeting != null)
+                {
+                    _context.Greetings.Remove(greeting);
+                    _context.SaveChanges();
+                    _logger.LogInformation($"Greeting with ID {id} deleted successfully.");
+                    return true;
+                }
+
+                _logger.LogWarning($"Greeting with ID {id} not found.");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"An error occurred while deleting greeting with ID {id}: {ex.Message}");
+                throw;
+            }
+        }
+
     }
 }

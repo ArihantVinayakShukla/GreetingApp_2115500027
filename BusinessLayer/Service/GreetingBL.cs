@@ -124,6 +124,31 @@ namespace BusinessLayer.Service
             }
         }
 
+        public bool DeleteGreetingMessage(int id)
+        {
+            try
+            {
+                _logger.LogInformation($"Attempting to delete greeting with ID: {id}");
+
+                bool isDeleted = _greetingRL.DeleteGreetingMessage(id);
+
+                if (isDeleted)
+                {
+                    _logger.LogInformation($"Greeting with ID {id} deleted successfully.");
+                }
+                else
+                {
+                    _logger.LogWarning($"Greeting with ID {id} not found.");
+                }
+
+                return isDeleted;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error while deleting greeting ID {id}: {ex.Message}");
+                throw;
+            }
+        }
 
     }
 }
