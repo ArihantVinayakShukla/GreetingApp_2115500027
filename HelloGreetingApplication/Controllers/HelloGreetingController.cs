@@ -2,6 +2,7 @@ using BusinessLayer.Interface;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModelLayer.Model;
+using RepositoryLayer.Entity;
 using System.Collections.Generic;
 
 namespace HelloGreetingApplication.Controllers
@@ -194,6 +195,50 @@ namespace HelloGreetingApplication.Controllers
                 Message = "Personalized greeting retrieved successfully",
                 Data = message
             });
+        }
+
+        /// <summary>
+        /// save a greeting in the database
+        /// </summary>
+        /// <param name="message">string containing a greeting message</param>
+        /// <returns>saved greeting</returns>
+        [HttpPost("saveGreeting")]
+
+        public IActionResult SaveGreeting([FromBody] string message)
+        {
+            _logger.LogInformation("POST request received at /hellogreeting/saveGreeting");
+
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                _logger.LogWarning("SaveGreeting received an empty message.");
+                return BadRequest(new ResponseModel<string>
+                {
+                    Success = false,
+                    Message = "Message cannot be empty."
+                });
+            }
+
+            try
+            {
+                var savedGreeting = _greetingBL.SaveGreeting(message);
+                _logger.LogInformation("Greeting saved successfully.");
+
+                return Ok(new ResponseModel<GreetingEntity>
+                {
+                    Success = true,
+                    Message = "Greeting saved successfully",
+                    Data = savedGreeting
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error saving greeting: {ex.Message}");
+                return StatusCode(500, new ResponseModel<string>
+                {
+                    Success = false,
+                    Message = "An error occurred while saving the greeting."
+                });
+            }
         }
 
     }
