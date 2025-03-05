@@ -13,5 +13,7 @@ namespace RepositoryLayer.Interface
         string PersonalizedGreeting(RequestModel request);
 
         GreetingEntity SaveGreeting(GreetingEntity greeting);
+
+        GreetingEntity GetGreetingsById(int id);
     }
 }

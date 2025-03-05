@@ -67,5 +67,20 @@ namespace BusinessLayer.Service
                 throw;
             }
         }
+
+        public GreetingEntity GetGreetingsById(int id)
+        {
+            try
+            {
+                _logger.LogInformation($"Retrieving greeting with ID: {id} from the repository.");
+                return _greetingRL.GetGreetingsById(id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error in Business Layer while fetching greeting ID {id}: {ex.Message}");
+                throw; // Rethrow the exception to let the Controller handle it
+            }
+        }
+
     }
 }

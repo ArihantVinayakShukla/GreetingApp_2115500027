@@ -14,5 +14,7 @@ namespace BusinessLayer.Interface
         string PersonalizedGreeting(RequestModel requestModel);
 
         GreetingEntity SaveGreeting(string message);
+
+        GreetingEntity GetGreetingsById(int id);
     }
 }
