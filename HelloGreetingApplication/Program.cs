@@ -1,10 +1,13 @@
+using System;
 using BusinessLayer.Interface;
 using BusinessLayer.Service;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NLog;
 using NLog.Web;
+using RepositoryLayer.Context;
 using RepositoryLayer.Interface;
 using RepositoryLayer.Service;
 
@@ -15,15 +18,18 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
 
-    // Add services to the container
-    builder.Logging.ClearProviders(); // Remove default logging providers
-    builder.Host.UseNLog(); // Use NLog
+    
+    builder.Logging.ClearProviders(); 
+    builder.Host.UseNLog(); 
 
     builder.Services.AddScoped<IGreetingRL, GreetingRL>();
     builder.Services.AddScoped<IGreetingBL, GreetingBL>();
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
+
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    builder.Services.AddDbContext<GreetingDbContext>(options => options.UseSqlServer(connectionString));
 
     var app = builder.Build();
 
