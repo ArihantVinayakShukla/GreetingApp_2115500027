@@ -285,6 +285,48 @@ namespace HelloGreetingApplication.Controllers
             }
         }
 
+        /// <summary>
+        /// Get all greeting from the database
+        /// </summary>
+        /// <returns>List of greeting messages</returns>
+        [HttpGet("all")]
+        public IActionResult GetAllGreetings()
+        {
+            _logger.LogInformation("GET request received at /hellogreeting/all to fetch all greetings");
+
+            try
+            {
+                List<GreetingEntity> greetings = _greetingBL.GetAllGreetings();
+
+                if (greetings == null || greetings.Count == 0)
+                {
+                    _logger.LogWarning("No greetings found in the database.");
+                    return NotFound(new ResponseModel<string>
+                    {
+                        Success = false,
+                        Message = "No greetings found."
+                    });
+                }
+
+                _logger.LogInformation($"Retrieved {greetings.Count} greetings successfully.");
+                return Ok(new ResponseModel<List<GreetingEntity>>
+                {
+                    Success = true,
+                    Message = "Greetings retrieved successfully.",
+                    Data = greetings
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error retrieving greetings: {ex.Message}");
+                return StatusCode(500, new ResponseModel<string>
+                {
+                    Success = false,
+                    Message = "An error occurred while retrieving greetings."
+                });
+            }
+        }
+
 
     }
 }

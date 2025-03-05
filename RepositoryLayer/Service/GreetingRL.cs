@@ -87,5 +87,30 @@ namespace RepositoryLayer.Service
             }
         }
 
+        public List<GreetingEntity> GetAllGreetings()
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all greetings from the database.");
+                var greetings = _context.Greetings.ToList();
+
+                if (greetings == null || greetings.Count == 0)
+                {
+                    _logger.LogWarning("No greetings found in the database.");
+                }
+                else
+                {
+                    _logger.LogInformation($"Retrieved {greetings.Count} greetings from the database.");
+                }
+
+                return greetings;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"An error occurred while fetching all greetings: {ex.Message}");
+                throw;
+            }
+        }
+
     }
 }
