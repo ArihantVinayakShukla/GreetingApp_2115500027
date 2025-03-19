@@ -13,6 +13,6 @@ namespace RepositoryLayer.Interface
         UserDTO Register(RegisterDTO registerDTO);
         string Login(LoginDTO loginDTO);
         bool ForgotPassword(string email);
-        bool ResetPassword(string token, string newPassword);
+        bool ResetPassword(string email, string newPassword);
     }
 }
