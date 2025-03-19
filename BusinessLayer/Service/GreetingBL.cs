@@ -4,6 +4,7 @@ using ModelLayer.Model;
 using RepositoryLayer.Entity;
 using RepositoryLayer.Interface;
 using Microsoft.Extensions.Logging;
+using RepositoryLayer.Service;
 
 namespace BusinessLayer.Service
 {
@@ -40,56 +41,31 @@ namespace BusinessLayer.Service
             return greetingMessage;
         }
 
-        public GreetingEntity SaveGreeting(string message)
+        public GreetingEntity SaveGreeting(int userId, string message)
         {
-            _logger.LogInformation("SaveGreeting method called.");
+            _logger.LogInformation($"Saving greeting for User ID {userId}");
 
             if (string.IsNullOrWhiteSpace(message))
             {
-                _logger.LogWarning("SaveGreeting received an empty or null message.");
+                _logger.LogWarning("Message cannot be empty.");
                 throw new ArgumentException("Message cannot be null or empty.");
             }
 
-            GreetingEntity greeting = new GreetingEntity
-            {
-                Message = message
-            };
-
-            try
-            {
-                GreetingEntity savedGreeting = _greetingRL.SaveGreeting(greeting);
-                _logger.LogInformation("Greeting saved successfully.");
-                return savedGreeting;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error while saving greeting: {ex.Message}");
-                throw;
-            }
+            return _greetingRL.SaveGreeting(userId, message);
         }
 
-        public GreetingEntity GetGreetingsById(int id)
+        public GreetingEntity GetGreetingsById(int userId, int id)
+        {
+            _logger.LogInformation($"Fetching greeting ID {id} for User ID {userId}");
+            return _greetingRL.GetGreetingsById(userId, id);
+        }
+
+        public List<GreetingEntity> GetAllGreetings(int userId)
         {
             try
             {
-                _logger.LogInformation($"Retrieving greeting with ID: {id} from the repository.");
-                return _greetingRL.GetGreetingsById(id);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error in Business Layer while fetching greeting ID {id}: {ex.Message}");
-                throw; 
-            }
-        }
-
-        public List<GreetingEntity> GetAllGreetings()
-        {
-            try
-            {
-                _logger.LogInformation("Fetching all greetings from the repository.");
-                List<GreetingEntity> greetings = _greetingRL.GetAllGreetings();
-                _logger.LogInformation($"Successfully retrieved {greetings.Count} greetings.");
-                return greetings;
+                _logger.LogInformation($"Fetching all greetings for User ID {userId}");
+                return _greetingRL.GetAllGreetings(userId);
             }
             catch (Exception ex)
             {
@@ -98,24 +74,19 @@ namespace BusinessLayer.Service
             }
         }
 
-        public GreetingEntity EditGreetings(int id, string message)
+        public GreetingEntity EditGreetings(int userId, int id, string message)
         {
             try
             {
-                _logger.LogInformation($"Attempting to edit greeting with ID: {id}");
+                _logger.LogInformation($"Editing greeting ID {id} for User ID {userId}");
 
-                GreetingEntity updatedGreeting = _greetingRL.EditGreetings(id, message);
-
-                if (updatedGreeting != null)
+                if (string.IsNullOrWhiteSpace(message))
                 {
-                    _logger.LogInformation($"Greeting with ID: {id} updated successfully.");
-                }
-                else
-                {
-                    _logger.LogWarning($"Greeting with ID: {id} not found.");
+                    _logger.LogWarning("Message cannot be empty.");
+                    throw new ArgumentException("Message cannot be null or empty.");
                 }
 
-                return updatedGreeting;
+                return _greetingRL.EditGreetings(userId, id, message);
             }
             catch (Exception ex)
             {
@@ -124,24 +95,12 @@ namespace BusinessLayer.Service
             }
         }
 
-        public bool DeleteGreetingMessage(int id)
+        public bool DeleteGreetingMessage(int userId, int id)
         {
             try
             {
-                _logger.LogInformation($"Attempting to delete greeting with ID: {id}");
-
-                bool isDeleted = _greetingRL.DeleteGreetingMessage(id);
-
-                if (isDeleted)
-                {
-                    _logger.LogInformation($"Greeting with ID {id} deleted successfully.");
-                }
-                else
-                {
-                    _logger.LogWarning($"Greeting with ID {id} not found.");
-                }
-
-                return isDeleted;
+                _logger.LogInformation($"Deleting greeting ID {id} for User ID {userId}");
+                return _greetingRL.DeleteGreetingMessage(userId, id);
             }
             catch (Exception ex)
             {

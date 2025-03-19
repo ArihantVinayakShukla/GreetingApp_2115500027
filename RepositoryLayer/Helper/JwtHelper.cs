@@ -16,7 +16,7 @@ namespace RepositoryLayer.Helper
             _configuration = configuration;
         }
 
-        public string GenerateToken(string email)
+        public string GenerateToken(int userId, string email)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
@@ -25,8 +25,9 @@ namespace RepositoryLayer.Helper
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                    new Claim(ClaimTypes.Email, email)
-                }),
+            new Claim(ClaimTypes.NameIdentifier, userId.ToString()), 
+            new Claim(ClaimTypes.Email, email)
+        }),
                 Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = new SigningCredentials(
                     new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -35,5 +36,6 @@ namespace RepositoryLayer.Helper
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
+
     }
 }

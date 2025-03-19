@@ -1,10 +1,12 @@
 using BusinessLayer.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ModelLayer.Model;
 using RepositoryLayer.Entity;
 using System.Collections.Generic;
+using System.Security.Claims;
 
 namespace HelloGreetingApplication.Controllers
 {
@@ -13,6 +15,7 @@ namespace HelloGreetingApplication.Controllers
     /// </summary>
     [ApiController]
     [Route("[controller]")]
+    [Authorize]
     public class HelloGreetingController : ControllerBase
     {
         private readonly ILogger<HelloGreetingController> _logger;
@@ -24,6 +27,32 @@ namespace HelloGreetingApplication.Controllers
             _logger = logger;
             _greetingBL = greetingBL;
         }
+
+        /// <summary>
+        /// Extracts UserId from JWT Token
+        /// </summary>
+        private int GetUserIdFromToken()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+            {
+                _logger.LogWarning("JWT Token does not contain a valid UserId claim.");
+                return 0;
+            }
+
+            if (!int.TryParse(userIdClaim.Value, out int userId))
+            {
+                _logger.LogWarning($"JWT Token contains an invalid UserId: {userIdClaim.Value}");
+                return 0;
+            }
+
+            _logger.LogInformation($"User authorized. Extracted UserId: {userId}");
+            return userId;
+        }
+
+
+
 
         /// <summary>
         /// Get method to get the greeting message
@@ -199,12 +228,11 @@ namespace HelloGreetingApplication.Controllers
         }
 
         /// <summary>
-        /// save a greeting in the database
+        /// Save a greeting in the database linked to a user
         /// </summary>
-        /// <param name="message">string containing a greeting message</param>
-        /// <returns>saved greeting</returns>
+        /// <param name="message">Greeting message</param>
+        /// <returns>Saved greeting</returns>
         [HttpPost("saveGreeting")]
-
         public IActionResult SaveGreeting([FromBody] string message)
         {
             _logger.LogInformation("POST request received at /hellogreeting/saveGreeting");
@@ -219,10 +247,20 @@ namespace HelloGreetingApplication.Controllers
                 });
             }
 
+            int userId = GetUserIdFromToken();
+            if (userId == 0)
+            {
+                return Unauthorized(new ResponseModel<string>
+                {
+                    Success = false,
+                    Message = "Unauthorized user."
+                });
+            }
+
             try
             {
-                var savedGreeting = _greetingBL.SaveGreeting(message);
-                _logger.LogInformation("Greeting saved successfully.");
+                var savedGreeting = _greetingBL.SaveGreeting(userId, message);
+                _logger.LogInformation($"Greeting saved successfully for User ID: {userId}");
 
                 return Ok(new ResponseModel<GreetingEntity>
                 {
@@ -254,11 +292,12 @@ namespace HelloGreetingApplication.Controllers
 
             try
             {
-                var greeting = _greetingBL.GetGreetingsById(id);
+                int userId = GetUserIdFromToken();
+                var greeting = _greetingBL.GetGreetingsById(id, userId);
 
                 if (greeting == null)
                 {
-                    _logger.LogWarning($"Greeting with ID {id} not found.");
+                    _logger.LogWarning($"Greeting with ID {id} not found for User ID {userId}.");
                     return NotFound(new ResponseModel<string>
                     {
                         Success = false,
@@ -266,7 +305,6 @@ namespace HelloGreetingApplication.Controllers
                     });
                 }
 
-                _logger.LogInformation($"Greeting with ID {id} retrieved successfully.");
                 return Ok(new ResponseModel<GreetingEntity>
                 {
                     Success = true,
@@ -276,7 +314,7 @@ namespace HelloGreetingApplication.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error retrieving greeting with ID {id}: {ex.Message}");
+                _logger.LogError($"Error retrieving greeting: {ex.Message}");
                 return StatusCode(500, new ResponseModel<string>
                 {
                     Success = false,
@@ -292,15 +330,16 @@ namespace HelloGreetingApplication.Controllers
         [HttpGet("all")]
         public IActionResult GetAllGreetings()
         {
-            _logger.LogInformation("GET request received at /hellogreeting/all to fetch all greetings");
+            _logger.LogInformation("GET request received at /hellogreeting/all");
 
             try
             {
-                List<GreetingEntity> greetings = _greetingBL.GetAllGreetings();
+                int userId = GetUserIdFromToken();
+                List<GreetingEntity> greetings = _greetingBL.GetAllGreetings(userId);
 
-                if (greetings == null || greetings.Count == 0)
+                if (greetings.Count == 0)
                 {
-                    _logger.LogWarning("No greetings found in the database.");
+                    _logger.LogWarning($"No greetings found for User ID {userId}.");
                     return NotFound(new ResponseModel<string>
                     {
                         Success = false,
@@ -308,7 +347,6 @@ namespace HelloGreetingApplication.Controllers
                     });
                 }
 
-                _logger.LogInformation($"Retrieved {greetings.Count} greetings successfully.");
                 return Ok(new ResponseModel<List<GreetingEntity>>
                 {
                     Success = true,
@@ -334,25 +372,25 @@ namespace HelloGreetingApplication.Controllers
         /// <param name="message">Modified greeting</param>
         /// <returns>The edited greeting</returns>
         [HttpPut("edit/{id}")]
-        public IActionResult EditGreetings(int id, [FromBody] string message)
+        public IActionResult EditGreeting(int id, [FromBody] string message)
         {
-            _logger.LogInformation($"PUT request received to edit greeting with ID: {id}");
+            _logger.LogInformation($"PUT request to edit greeting ID: {id}");
 
             try
             {
-                var updatedGreeting = _greetingBL.EditGreetings(id, message);
+                int userId = GetUserIdFromToken();
+                var updatedGreeting = _greetingBL.EditGreetings(userId, id, message);
 
                 if (updatedGreeting == null)
                 {
-                    _logger.LogWarning($"Greeting with ID {id} not found.");
+                    _logger.LogWarning($"Greeting with ID {id} not found or unauthorized edit attempt.");
                     return NotFound(new ResponseModel<string>
                     {
                         Success = false,
-                        Message = $"Greeting with ID {id} not found."
+                        Message = "Greeting not found or unauthorized edit."
                     });
                 }
 
-                _logger.LogInformation($"Greeting with ID {id} updated successfully.");
                 return Ok(new ResponseModel<GreetingEntity>
                 {
                     Success = true,
@@ -362,7 +400,7 @@ namespace HelloGreetingApplication.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error updating greeting with ID {id}: {ex.Message}");
+                _logger.LogError($"Error updating greeting: {ex.Message}");
                 return StatusCode(500, new ResponseModel<string>
                 {
                     Success = false,
@@ -383,28 +421,28 @@ namespace HelloGreetingApplication.Controllers
 
             try
             {
-                bool isDeleted = _greetingBL.DeleteGreetingMessage(id);
+                int userId = GetUserIdFromToken();
+                bool isDeleted = _greetingBL.DeleteGreetingMessage(id, userId);
 
                 if (!isDeleted)
                 {
-                    _logger.LogWarning($"Greeting with ID {id} not found.");
+                    _logger.LogWarning($"Greeting with ID {id} not found or unauthorized delete attempt.");
                     return NotFound(new ResponseModel<string>
                     {
                         Success = false,
-                        Message = $"Greeting with ID {id} not found."
+                        Message = "Greeting not found or unauthorized delete."
                     });
                 }
 
-                _logger.LogInformation($"Greeting with ID {id} deleted successfully.");
                 return Ok(new ResponseModel<string>
                 {
                     Success = true,
-                    Message = $"Greeting with ID {id} has been deleted."
+                    Message = "Greeting deleted successfully."
                 });
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error deleting greeting with ID {id}: {ex.Message}");
+                _logger.LogError($"Error deleting greeting: {ex.Message}");
                 return StatusCode(500, new ResponseModel<string>
                 {
                     Success = false,
@@ -412,9 +450,5 @@ namespace HelloGreetingApplication.Controllers
                 });
             }
         }
-
-
-
-
     }
 }

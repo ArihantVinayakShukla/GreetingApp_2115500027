@@ -16,5 +16,11 @@ namespace RepositoryLayer.Entity
 
         [Required]
         public string Message { get; set; }
+
+        [Required]
+        public int? UserId { get; set; }
+
+        [ForeignKey("UserId")]
+        public virtual UserEntity User { get; set; }
     }
 }

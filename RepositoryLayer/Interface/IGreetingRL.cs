@@ -12,14 +12,14 @@ namespace RepositoryLayer.Interface
     {
         string PersonalizedGreeting(RequestModel request);
 
-        GreetingEntity SaveGreeting(GreetingEntity greeting);
+        GreetingEntity SaveGreeting(int userId, string message);
 
-        GreetingEntity GetGreetingsById(int id);
+        GreetingEntity GetGreetingsById(int userId, int id);
 
-        List<GreetingEntity> GetAllGreetings();
+        List<GreetingEntity> GetAllGreetings(int userId);
 
-        GreetingEntity EditGreetings(int id, string message);
+        GreetingEntity EditGreetings(int userId, int id, string message);
 
-        bool DeleteGreetingMessage(int id);
+        bool DeleteGreetingMessage(int userId, int id);
     }
 }

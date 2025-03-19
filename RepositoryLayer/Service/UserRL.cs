@@ -63,7 +63,7 @@ namespace RepositoryLayer.Service
                 return null; 
             }
 
-            string token = _jwtHelper.GenerateToken(user.Email);
+            string token = _jwtHelper.GenerateToken(user.UserId, user.Email);
 
             return token;
         }
@@ -77,7 +77,7 @@ namespace RepositoryLayer.Service
                 return false;
             }
 
-            string token = _resetTokenHelper.GeneratePasswordResetToken(user.Id, user.Email);
+            string token = _resetTokenHelper.GeneratePasswordResetToken(user.UserId, user.Email);
 
             string baseUrl = _configuration["Application:BaseUrl"];
 

@@ -13,14 +13,14 @@ namespace BusinessLayer.Interface
         string GetGreeting();
         string PersonalizedGreeting(RequestModel requestModel);
 
-        GreetingEntity SaveGreeting(string message);
+        GreetingEntity SaveGreeting(int userId, string message);
 
-        GreetingEntity GetGreetingsById(int id);
+        GreetingEntity GetGreetingsById(int userId, int id);
 
-        List<GreetingEntity> GetAllGreetings();
+        List<GreetingEntity> GetAllGreetings(int userId);
 
-        GreetingEntity EditGreetings(int id, string message);
+        GreetingEntity EditGreetings(int userId, int id, string message);
 
-        bool DeleteGreetingMessage(int id);
+        bool DeleteGreetingMessage(int userId, int id);
     }
 }

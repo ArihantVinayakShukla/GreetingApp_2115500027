@@ -47,11 +47,24 @@ namespace RepositoryLayer.Service
             return "Hello, World!";
         }
 
-        public GreetingEntity SaveGreeting(GreetingEntity greeting)
+        public GreetingEntity SaveGreeting(int userId, string message)
         {
             try
             {
-                _logger.LogInformation("Saving greeting to database.");
+                _logger.LogInformation($"Saving greeting for User ID: {userId}");
+
+                var user = _context.Users.FirstOrDefault(u => u.UserId == userId);
+                if (user == null)
+                {
+                    _logger.LogWarning($"User with ID {userId} not found.");
+                    return null;
+                }
+
+                var greeting = new GreetingEntity
+                {
+                    UserId = userId,
+                    Message = message,
+                };
 
                 _context.Greetings.Add(greeting);
                 _context.SaveChanges();
@@ -66,100 +79,96 @@ namespace RepositoryLayer.Service
             }
         }
 
-        public GreetingEntity GetGreetingsById(int id)
+        public GreetingEntity GetGreetingsById(int userId, int id)
         {
             try
             {
-                _logger.LogInformation($"Fetching greeting with ID: {id}");
-                var greeting = _context.Greetings.FirstOrDefault(g => g.Id == id);
+                _logger.LogInformation($"Fetching greeting ID {id} for User ID {userId}");
+
+                var greeting = _context.Greetings.FirstOrDefault(g => g.Id == id && g.UserId == userId);
 
                 if (greeting == null)
                 {
-                    _logger.LogWarning($"Greeting with ID {id} not found.");
+                    _logger.LogWarning($"Greeting ID {id} not found for User ID {userId}.");
                 }
 
                 return greeting;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"An error occurred while fetching greeting with ID {id}: {ex.Message}");
+                _logger.LogError($"Error while fetching greeting ID {id}: {ex.Message}");
                 throw;
             }
         }
 
-        public List<GreetingEntity> GetAllGreetings()
+        public List<GreetingEntity> GetAllGreetings( int userId)
         {
             try
             {
-                _logger.LogInformation("Fetching all greetings from the database.");
-                var greetings = _context.Greetings.ToList();
+                _logger.LogInformation($"Fetching all greetings for User ID {userId}");
 
-                if (greetings == null || greetings.Count == 0)
+                var greetings = _context.Greetings.Where(g => g.UserId == userId).ToList();
+
+                if (greetings.Count == 0)
                 {
-                    _logger.LogWarning("No greetings found in the database.");
-                }
-                else
-                {
-                    _logger.LogInformation($"Retrieved {greetings.Count} greetings from the database.");
+                    _logger.LogWarning("No greetings found for this user.");
                 }
 
                 return greetings;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"An error occurred while fetching all greetings: {ex.Message}");
+                _logger.LogError($"Error while fetching greetings: {ex.Message}");
                 throw;
             }
         }
 
-        public GreetingEntity EditGreetings(int id, string message)
+        public GreetingEntity EditGreetings(int userId, int id, string message)
         {
             try
             {
-                _logger.LogInformation($"Attempting to edit greeting with ID: {id}");
+                _logger.LogInformation($"Editing greeting ID {id} for User ID {userId}");
 
-                var greeting = _context.Greetings.FirstOrDefault(g => g.Id == id);
+                var greeting = _context.Greetings.FirstOrDefault(g => g.Id == id && g.UserId == userId);
                 if (greeting != null)
                 {
                     greeting.Message = message;
                     _context.SaveChanges();
-                    _logger.LogInformation($"Greeting with ID: {id} updated successfully.");
-                }
-                else
-                {
-                    _logger.LogWarning($"Greeting with ID: {id} not found.");
+                    _logger.LogInformation("Greeting updated successfully.");
+                    return greeting;
                 }
 
-                return greeting;
+                _logger.LogWarning($"Greeting ID {id} not found for User ID {userId}.");
+                return null;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"An error occurred while editing greeting with ID {id}: {ex.Message}");
+                _logger.LogError($"Error while editing greeting ID {id}: {ex.Message}");
                 throw;
             }
         }
 
-        public bool DeleteGreetingMessage(int id)
+        public bool DeleteGreetingMessage(int userId, int id)
         {
             try
             {
-                _logger.LogInformation($"Attempting to delete greeting with ID: {id}");
-                var greeting = _context.Greetings.FirstOrDefault(g => g.Id == id);
+                _logger.LogInformation($"Deleting greeting ID {id} for User ID {userId}");
 
+                var greeting = _context.Greetings.FirstOrDefault(g => g.Id == id && g.UserId == userId);
                 if (greeting != null)
                 {
                     _context.Greetings.Remove(greeting);
                     _context.SaveChanges();
-                    _logger.LogInformation($"Greeting with ID {id} deleted successfully.");
+                    _logger.LogInformation("Greeting deleted successfully.");
                     return true;
                 }
 
-                _logger.LogWarning($"Greeting with ID {id} not found.");
+                _logger.LogWarning($"Greeting ID {id} not found for User ID {userId}.");
                 return false;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"An error occurred while deleting greeting with ID {id}: {ex.Message}");
+                _logger.LogError($"Error while deleting greeting ID {id}: {ex.Message}");
                 throw;
             }
         }
