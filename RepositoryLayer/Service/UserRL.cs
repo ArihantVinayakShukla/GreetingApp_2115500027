@@ -9,6 +9,7 @@ using RepositoryLayer.Hashing;
 using RepositoryLayer.Interface;
 using ModelLayer.DTO;
 using RepositoryLayer.Helper;
+using Microsoft.Extensions.Configuration;
 
 namespace RepositoryLayer.Service
 {
@@ -17,12 +18,18 @@ namespace RepositoryLayer.Service
         private readonly GreetingDbContext _context;
         private readonly Password_Hash _passwordHash;
         private readonly JwtHelper _jwtHelper;
+        private readonly EmailService _emailService;
+        private readonly ResetTokenHelper _resetTokenHelper;
+        private readonly IConfiguration _configuration;
 
-        public UserRL(GreetingDbContext context, JwtHelper jwtHelper)
+        public UserRL(GreetingDbContext context, JwtHelper jwtHelper, EmailService emailService, ResetTokenHelper resetTokenHelper, IConfiguration configuration)
         {
             _context = context;
             _passwordHash = new Password_Hash();
             _jwtHelper = jwtHelper;
+            _emailService = emailService;
+            _resetTokenHelper = resetTokenHelper;
+            _configuration = configuration;
         }
 
         public UserDTO Register(RegisterDTO registerDTO)
@@ -64,15 +71,40 @@ namespace RepositoryLayer.Service
         public bool ForgotPassword(string email)
         {
             var user = _context.Users.FirstOrDefault(u => u.Email == email);
-            return user != null;
+
+            if(user == null)
+            {
+                return false;
+            }
+
+            string token = _resetTokenHelper.GeneratePasswordResetToken(user.Id, user.Email);
+
+            string baseUrl = _configuration["Application:BaseUrl"];
+
+            bool emailSent = _emailService.SendPasswordResetEmail(email, token, baseUrl);
+
+            return emailSent;
         }
 
-        public bool ResetPassword(string email, string newPassword)
+        public bool ResetPassword(string token, string newPassword)
         {
-            var user = _context.Users.FirstOrDefault(u => u.Email == email);
-            if (user == null) return false;
+            if (!_resetTokenHelper.ValidatePasswordResetToken(token, out string email))
+            {
+                return false;
+            }
 
-            user.PasswordHash = _passwordHash.HashPassword(newPassword);
+            var user = _context.Users.FirstOrDefault(u => u.Email == email);
+
+            if (user == null)
+            {
+                return false;
+            }
+
+            var passwordHasher = new Password_Hash();
+            string hashedPassword = passwordHasher.HashPassword(newPassword);
+
+            user.PasswordHash = hashedPassword;
+
             _context.SaveChanges();
             return true;
         }

@@ -26,6 +26,9 @@ try
     builder.Host.UseNLog();
 
     builder.Services.AddSingleton<JwtHelper>();
+    builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SMTP"));
+    builder.Services.AddScoped<EmailService>();
+    builder.Services.AddScoped<ResetTokenHelper>();
     builder.Services.AddScoped<IGreetingRL, GreetingRL>();
     builder.Services.AddScoped<IGreetingBL, GreetingBL>();
     builder.Services.AddScoped<IUserRL, UserRL>();

@@ -65,11 +65,11 @@ namespace BusinessLayer.Service
             }
         }
 
-        public bool ResetPassword(string email, string newPassword)
+        public bool ResetPassword(string token, string newPassword)
         {
             try
             {
-                return _userRL.ResetPassword(email, newPassword);
+                return _userRL.ResetPassword(token, newPassword);
             }
             catch (Exception ex)
             {

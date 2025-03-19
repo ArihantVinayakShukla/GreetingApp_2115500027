@@ -162,13 +162,13 @@ namespace HelloGreetingApplication.Controllers
         /// <param name="resetPasswordDTO">email and newPassword</param>
         /// <returns>Success Message if successful</returns>
         [HttpPost("reset-password")]
-        public IActionResult ResetPassword([FromBody] ResetPasswordDTO resetPasswordDTO)
+        public IActionResult ResetPassword([FromQuery] string token, [FromBody] ResetPasswordDTO resetPasswordDTO)
         {
             try
             {
-                _logger.LogInformation("POST request received for reset-password with email: {Email}", resetPasswordDTO.Email);
+                _logger.LogInformation("POST request received for reset-password with token: {Token}", token);
 
-                var result = _userBL.ResetPassword(resetPasswordDTO.Email, resetPasswordDTO.NewPassword);
+                var result = _userBL.ResetPassword(token, resetPasswordDTO.newPassword);
 
                 var response = new ResponseModel<object>
                 {
@@ -179,16 +179,16 @@ namespace HelloGreetingApplication.Controllers
 
                 if (!result)
                 {
-                    _logger.LogWarning("Password reset failed for email: {Email} - User not found", resetPasswordDTO.Email);
+                    _logger.LogWarning("Password reset failed - Token might be invalid or user not found.");
                     return NotFound(response);
                 }
 
-                _logger.LogInformation("Password reset successfully for email: {Email}", resetPasswordDTO.Email);
+                _logger.LogInformation("Password reset successfully for token: {Token}", token);
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error during password reset for email {Email}: {ErrorMessage}", resetPasswordDTO.Email, ex.Message);
+                _logger.LogError("Error during password reset attempt for token {Token}: {ErrorMessage}", token, ex.Message);
                 return BadRequest(new ResponseModel<object>
                 {
                     Success = false,
@@ -197,5 +197,6 @@ namespace HelloGreetingApplication.Controllers
                 });
             }
         }
+
     }
 }
