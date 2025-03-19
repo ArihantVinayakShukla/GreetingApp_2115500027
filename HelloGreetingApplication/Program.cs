@@ -1,16 +1,15 @@
-using System;
-using System.IO;
 using System.Reflection;
+using System.Text;
 using BusinessLayer.Interface;
 using BusinessLayer.Service;
-using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NLog;
 using NLog.Web;
 using RepositoryLayer.Context;
+using RepositoryLayer.Helper;
 using RepositoryLayer.Interface;
 using RepositoryLayer.Middleware;
 using RepositoryLayer.Service;
@@ -21,20 +20,20 @@ logger.Info("Starting the application...");
 try
 {
     var builder = WebApplication.CreateBuilder(args);
+    var configuration = builder.Configuration;  
 
     builder.Logging.ClearProviders();
     builder.Host.UseNLog();
 
+    builder.Services.AddSingleton<JwtHelper>();
     builder.Services.AddScoped<IGreetingRL, GreetingRL>();
     builder.Services.AddScoped<IGreetingBL, GreetingBL>();
     builder.Services.AddScoped<IUserRL, UserRL>();
     builder.Services.AddScoped<IUserBL, UserBL>();
 
     builder.Services.AddControllers();
-
     builder.Services.AddEndpointsApiExplorer();
 
-    // Configure Swagger to include XML documentation
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
 
@@ -46,10 +45,9 @@ try
         }
         else
         {
-            Console.WriteLine($"? Warning: XML documentation file not found at {xmlPath}");
+            logger.Warn($"XML documentation file not found at {xmlPath}");
         }
 
-        // Add security definition for future JWT auth (optional)
         options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
         {
             Description = "JWT Authorization header using the Bearer scheme. Example: 'Bearer {token}'",
@@ -75,19 +73,38 @@ try
         });
     });
 
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    var connectionString = configuration.GetConnectionString("DefaultConnection")
+        ?? throw new InvalidOperationException("Database connection string is missing.");
+
     builder.Services.AddDbContext<GreetingDbContext>(options => options.UseSqlServer(connectionString));
+
+    var key = Encoding.UTF8.GetBytes(configuration["Jwt:Key"]);
+
+    builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key)
+            };
+        });
+
+    builder.Services.AddAuthorization();
 
     var app = builder.Build();
 
-    // Configure the HTTP request pipeline
     if (app.Environment.IsDevelopment())
     {
         app.UseSwagger();
         app.UseSwaggerUI();
     }
 
-    app.UseMiddleware<GlobalExceptionMiddleware>();
+    app.UseMiddleware<GlobalExceptionMiddleware>(); 
+    app.UseAuthentication();
     app.UseAuthorization();
     app.MapControllers();
 

@@ -1,5 +1,6 @@
 ﻿using BusinessLayer.Interface;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using ModelLayer.DTO;
 using ModelLayer.Model;
 using RepositoryLayer.Entity;
@@ -12,10 +13,13 @@ namespace HelloGreetingApplication.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserBL _userBL;
+        private readonly ILogger<UserController> _logger;
 
-        public UserController(IUserBL userBL)
+        // Constructor with logger
+        public UserController(IUserBL userBL, ILogger<UserController> logger)
         {
             _userBL = userBL;
+            _logger = logger;
         }
 
         /// <summary>
@@ -28,6 +32,8 @@ namespace HelloGreetingApplication.Controllers
         {
             try
             {
+                _logger.LogInformation("POST request received to register user with email: {Email}", registerDTO.Email);
+
                 var result = _userBL.Register(registerDTO);
 
                 var response = new ResponseModel<object>
@@ -37,10 +43,20 @@ namespace HelloGreetingApplication.Controllers
                     Data = result
                 };
 
+                if (result != null)
+                {
+                    _logger.LogInformation("User with email {Email} registered successfully", registerDTO.Email);
+                }
+                else
+                {
+                    _logger.LogWarning("User registration failed for email: {Email}", registerDTO.Email);
+                }
+
                 return Ok(response);
             }
             catch (Exception ex)
             {
+                _logger.LogError("Error during user registration for email {Email}: {ErrorMessage}", registerDTO.Email, ex.Message);
                 return BadRequest(new ResponseModel<object>
                 {
                     Success = false,
@@ -60,10 +76,13 @@ namespace HelloGreetingApplication.Controllers
         {
             try
             {
+                _logger.LogInformation("POST request received for login with email: {Email}", loginDTO.Email);
+
                 var result = _userBL.Login(loginDTO);
 
                 if (result == null)
                 {
+                    _logger.LogWarning("Login failed for email: {Email} - Invalid credentials", loginDTO.Email);
                     return Unauthorized(new ResponseModel<object>
                     {
                         Success = false,
@@ -71,6 +90,8 @@ namespace HelloGreetingApplication.Controllers
                         Data = null
                     });
                 }
+
+                _logger.LogInformation("User with email {Email} logged in successfully", loginDTO.Email);
 
                 var response = new ResponseModel<object>
                 {
@@ -83,6 +104,7 @@ namespace HelloGreetingApplication.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError("Error during login attempt for email {Email}: {ErrorMessage}", loginDTO.Email, ex.Message);
                 return BadRequest(new ResponseModel<object>
                 {
                     Success = false,
@@ -102,6 +124,8 @@ namespace HelloGreetingApplication.Controllers
         {
             try
             {
+                _logger.LogInformation("POST request received for forgot-password with email: {Email}", email);
+
                 var result = _userBL.ForgotPassword(email);
 
                 var response = new ResponseModel<object>
@@ -112,12 +136,17 @@ namespace HelloGreetingApplication.Controllers
                 };
 
                 if (!result)
+                {
+                    _logger.LogWarning("Password reset failed for email: {Email} - Email not found", email);
                     return NotFound(response);
+                }
 
+                _logger.LogInformation("Password reset email sent for email: {Email}", email);
                 return Ok(response);
             }
             catch (Exception ex)
             {
+                _logger.LogError("Error during forgot-password request for email {Email}: {ErrorMessage}", email, ex.Message);
                 return BadRequest(new ResponseModel<object>
                 {
                     Success = false,
@@ -131,12 +160,14 @@ namespace HelloGreetingApplication.Controllers
         /// Resets the user's password
         /// </summary>
         /// <param name="resetPasswordDTO">email and newPassword</param>
-        /// <returns>Success Message if succesfull</returns>
+        /// <returns>Success Message if successful</returns>
         [HttpPost("reset-password")]
         public IActionResult ResetPassword([FromBody] ResetPasswordDTO resetPasswordDTO)
         {
             try
             {
+                _logger.LogInformation("POST request received for reset-password with email: {Email}", resetPasswordDTO.Email);
+
                 var result = _userBL.ResetPassword(resetPasswordDTO.Email, resetPasswordDTO.NewPassword);
 
                 var response = new ResponseModel<object>
@@ -147,12 +178,17 @@ namespace HelloGreetingApplication.Controllers
                 };
 
                 if (!result)
+                {
+                    _logger.LogWarning("Password reset failed for email: {Email} - User not found", resetPasswordDTO.Email);
                     return NotFound(response);
+                }
 
+                _logger.LogInformation("Password reset successfully for email: {Email}", resetPasswordDTO.Email);
                 return Ok(response);
             }
             catch (Exception ex)
             {
+                _logger.LogError("Error during password reset for email {Email}: {ErrorMessage}", resetPasswordDTO.Email, ex.Message);
                 return BadRequest(new ResponseModel<object>
                 {
                     Success = false,
