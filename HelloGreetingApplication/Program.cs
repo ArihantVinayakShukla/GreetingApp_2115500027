@@ -27,6 +27,9 @@ try
 
     builder.Services.AddScoped<IGreetingRL, GreetingRL>();
     builder.Services.AddScoped<IGreetingBL, GreetingBL>();
+    builder.Services.AddScoped<IUserRL, UserRL>();
+    builder.Services.AddScoped<IUserBL, UserBL>();
+
     builder.Services.AddControllers();
 
     builder.Services.AddEndpointsApiExplorer();
