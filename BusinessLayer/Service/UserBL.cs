@@ -34,18 +34,18 @@ namespace BusinessLayer.Service
             }
         }
 
-        public UserDTO Login(LoginDTO loginDTO)
+        public string Login(LoginDTO loginDTO)
         {
             try
             {
-                var userDTO = _userRL.Login(loginDTO);
+                var token = _userRL.Login(loginDTO);
 
-                if (userDTO == null)
+                if (token == null)
                 {
                     throw new Exception("Invalid email or password.");
                 }
 
-                return userDTO;
+                return token;
             }
             catch (Exception ex)
             {

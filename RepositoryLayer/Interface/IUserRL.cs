@@ -11,7 +11,7 @@ namespace RepositoryLayer.Interface
     public interface IUserRL
     {
         UserDTO Register(RegisterDTO registerDTO);
-        UserDTO Login(LoginDTO loginDTO);
+        string Login(LoginDTO loginDTO);
         bool ForgotPassword(string email);
         bool ResetPassword(string email, string newPassword);
     }

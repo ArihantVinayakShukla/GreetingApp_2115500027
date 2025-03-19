@@ -8,6 +8,7 @@ using RepositoryLayer.Entity;
 using RepositoryLayer.Hashing;
 using RepositoryLayer.Interface;
 using ModelLayer.DTO;
+using RepositoryLayer.Helper;
 
 namespace RepositoryLayer.Service
 {
@@ -15,11 +16,13 @@ namespace RepositoryLayer.Service
     {
         private readonly GreetingDbContext _context;
         private readonly Password_Hash _passwordHash;
+        private readonly JwtHelper _jwtHelper;
 
-        public UserRL(GreetingDbContext context)
+        public UserRL(GreetingDbContext context, JwtHelper jwtHelper)
         {
             _context = context;
             _passwordHash = new Password_Hash();
+            _jwtHelper = jwtHelper;
         }
 
         public UserDTO Register(RegisterDTO registerDTO)
@@ -45,7 +48,7 @@ namespace RepositoryLayer.Service
             };
         }
 
-        public UserDTO Login(LoginDTO loginDTO)
+        public string Login(LoginDTO loginDTO)
         {
             var user = _context.Users.FirstOrDefault(u => u.Email == loginDTO.Email);
             if (user == null || !_passwordHash.VerifyPassword(loginDTO.Password, user.PasswordHash))
@@ -53,12 +56,9 @@ namespace RepositoryLayer.Service
                 return null; 
             }
 
-            return new UserDTO
-            {
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Email = user.Email,
-            };
+            string token = _jwtHelper.GenerateToken(user.Email);
+
+            return token;
         }
 
         public bool ForgotPassword(string email)
