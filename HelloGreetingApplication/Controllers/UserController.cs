@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ModelLayer.DTO;
 using ModelLayer.Model;
-using RepositoryLayer.Entity;
 using System;
+using System.Threading.Tasks;
 
 namespace HelloGreetingApplication.Controllers
 {
@@ -15,7 +15,6 @@ namespace HelloGreetingApplication.Controllers
         private readonly IUserBL _userBL;
         private readonly ILogger<UserController> _logger;
 
-        // Constructor with logger
         public UserController(IUserBL userBL, ILogger<UserController> logger)
         {
             _userBL = userBL;
@@ -26,15 +25,15 @@ namespace HelloGreetingApplication.Controllers
         /// Registers a new user.
         /// </summary>
         /// <param name="registerDTO">User registration details</param>
-        /// <returns>returns the registered user details</returns>
+        /// <returns>Returns the registered user details</returns>
         [HttpPost("register")]
-        public IActionResult Register([FromBody] RegisterDTO registerDTO)
+        public async Task<IActionResult> Register([FromBody] RegisterDTO registerDTO)
         {
             try
             {
                 _logger.LogInformation("POST request received to register user with email: {Email}", registerDTO.Email);
 
-                var result = _userBL.Register(registerDTO);
+                var result = await _userBL.Register(registerDTO).ConfigureAwait(false);
 
                 var response = new ResponseModel<object>
                 {
@@ -67,18 +66,18 @@ namespace HelloGreetingApplication.Controllers
         }
 
         /// <summary>
-        /// Logs in the user
+        /// Logs in the user.
         /// </summary>
         /// <param name="loginDTO">User login credentials</param>
-        /// <returns>returns the logged in user details</returns>
+        /// <returns>Returns the logged-in user details</returns>
         [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginDTO loginDTO)
+        public async Task<IActionResult> Login([FromBody] LoginDTO loginDTO)
         {
             try
             {
                 _logger.LogInformation("POST request received for login with email: {Email}", loginDTO.Email);
 
-                var result = _userBL.Login(loginDTO);
+                var result = await _userBL.Login(loginDTO).ConfigureAwait(false);
 
                 if (result == null)
                 {
@@ -117,16 +116,16 @@ namespace HelloGreetingApplication.Controllers
         /// <summary>
         /// Requests a password reset by sending a reset email to the provided email address.
         /// </summary>
-        /// <param name="email">user email</param>
-        /// <returns>a password reset email </returns>
+        /// <param name="email">User email</param>
+        /// <returns>A password reset email</returns>
         [HttpPost("forgot-password")]
-        public IActionResult ForgotPassword([FromBody] string email)
+        public async Task<IActionResult> ForgotPassword([FromBody] string email)
         {
             try
             {
                 _logger.LogInformation("POST request received for forgot-password with email: {Email}", email);
 
-                var result = _userBL.ForgotPassword(email);
+                var result = await _userBL.ForgotPassword(email).ConfigureAwait(false);
 
                 var response = new ResponseModel<object>
                 {
@@ -157,18 +156,19 @@ namespace HelloGreetingApplication.Controllers
         }
 
         /// <summary>
-        /// Resets the user's password
+        /// Resets the user's password.
         /// </summary>
-        /// <param name="resetPasswordDTO">email and newPassword</param>
-        /// <returns>Success Message if successful</returns>
+        /// <param name="token">Password reset token</param>
+        /// <param name="resetPasswordDTO">Email and new password</param>
+        /// <returns>Success message if successful</returns>
         [HttpPost("reset-password")]
-        public IActionResult ResetPassword([FromQuery] string token, [FromBody] ResetPasswordDTO resetPasswordDTO)
+        public async Task<IActionResult> ResetPassword([FromQuery] string token, [FromBody] ResetPasswordDTO resetPasswordDTO)
         {
             try
             {
                 _logger.LogInformation("POST request received for reset-password with token: {Token}", token);
 
-                var result = _userBL.ResetPassword(token, resetPasswordDTO.newPassword);
+                var result = await _userBL.ResetPassword(token, resetPasswordDTO.newPassword).ConfigureAwait(false);
 
                 var response = new ResponseModel<object>
                 {
@@ -197,6 +197,5 @@ namespace HelloGreetingApplication.Controllers
                 });
             }
         }
-
     }
 }

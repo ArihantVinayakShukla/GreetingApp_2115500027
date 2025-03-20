@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using RepositoryLayer.Context;
 using RepositoryLayer.Entity;
@@ -21,8 +19,11 @@ namespace RepositoryLayer.Service
         private readonly EmailService _emailService;
         private readonly ResetTokenHelper _resetTokenHelper;
         private readonly IConfiguration _configuration;
+        private readonly RedisCacheHelper _redisCacheHelper;
 
-        public UserRL(GreetingDbContext context, JwtHelper jwtHelper, EmailService emailService, ResetTokenHelper resetTokenHelper, IConfiguration configuration)
+        public UserRL(GreetingDbContext context, JwtHelper jwtHelper, EmailService emailService,
+                      ResetTokenHelper resetTokenHelper, IConfiguration configuration,
+                      RedisCacheHelper redisCacheHelper)
         {
             _context = context;
             _passwordHash = new Password_Hash();
@@ -30,9 +31,10 @@ namespace RepositoryLayer.Service
             _emailService = emailService;
             _resetTokenHelper = resetTokenHelper;
             _configuration = configuration;
+            _redisCacheHelper = redisCacheHelper;
         }
 
-        public UserDTO Register(RegisterDTO registerDTO)
+        public async Task<UserDTO> Register(RegisterDTO registerDTO)
         {
             string hashedPassword = _passwordHash.HashPassword(registerDTO.Password);
 
@@ -45,50 +47,79 @@ namespace RepositoryLayer.Service
             };
 
             _context.Users.Add(userEntity);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
-            return new UserDTO
+            var userDTO = new UserDTO
             {
                 FirstName = userEntity.FirstName,
                 LastName = userEntity.LastName,
                 Email = userEntity.Email,
             };
+
+            await _redisCacheHelper.SetCacheAsync($"user:{userEntity.Email}", userDTO);
+
+            return userDTO;
         }
 
-        public string Login(LoginDTO loginDTO)
+        public async Task<string> Login(LoginDTO loginDTO)
         {
-            var user = _context.Users.FirstOrDefault(u => u.Email == loginDTO.Email);
-            if (user == null || !_passwordHash.VerifyPassword(loginDTO.Password, user.PasswordHash))
+            var cachedUser = await _redisCacheHelper.GetCacheAsync<UserDTO>($"user:{loginDTO.Email}");
+            UserEntity user;
+
+            if (cachedUser != null)
             {
-                return null; 
+                user = _context.Users.FirstOrDefault(u => u.Email == cachedUser.Email);
+            }
+            else
+            {
+                user = _context.Users.FirstOrDefault(u => u.Email == loginDTO.Email);
+
+                if (user != null)
+                {
+                    await _redisCacheHelper.SetCacheAsync($"user:{user.Email}", new UserDTO
+                    {
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Email = user.Email
+                    });
+                }
             }
 
-            string token = _jwtHelper.GenerateToken(user.UserId, user.Email);
+            if (user == null || !_passwordHash.VerifyPassword(loginDTO.Password, user.PasswordHash))
+            {
+                return null;
+            }
 
-            return token;
+            return _jwtHelper.GenerateToken(user.UserId, user.Email);
         }
 
-        public bool ForgotPassword(string email)
+        public async Task<bool> ForgotPassword(string email)
         {
             var user = _context.Users.FirstOrDefault(u => u.Email == email);
 
-            if(user == null)
+            if (user == null)
             {
                 return false;
             }
 
             string token = _resetTokenHelper.GeneratePasswordResetToken(user.UserId, user.Email);
-
             string baseUrl = _configuration["Application:BaseUrl"];
 
             bool emailSent = _emailService.SendPasswordResetEmail(email, token, baseUrl);
 
+            if (emailSent)
+            {
+                await _redisCacheHelper.SetCacheAsync($"resetToken:{email}", token);
+            }
+
             return emailSent;
         }
 
-        public bool ResetPassword(string token, string newPassword)
+        public async Task<bool> ResetPassword(string token, string newPassword)
         {
-            if (!_resetTokenHelper.ValidatePasswordResetToken(token, out string email))
+            string cachedToken = await _redisCacheHelper.GetCacheAsync<string>($"resetToken:{token}");
+
+            if (cachedToken == null || !_resetTokenHelper.ValidatePasswordResetToken(token, out string email))
             {
                 return false;
             }
@@ -100,12 +131,13 @@ namespace RepositoryLayer.Service
                 return false;
             }
 
-            var passwordHasher = new Password_Hash();
-            string hashedPassword = passwordHasher.HashPassword(newPassword);
-
+            string hashedPassword = _passwordHash.HashPassword(newPassword);
             user.PasswordHash = hashedPassword;
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
+
+            await _redisCacheHelper.RemoveCacheAsync($"resetToken:{token}");
+
             return true;
         }
     }
