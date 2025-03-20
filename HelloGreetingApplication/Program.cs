@@ -14,6 +14,7 @@ using RepositoryLayer.Interface;
 using RepositoryLayer.Middleware;
 using RepositoryLayer.Service;
 
+
 var logger = LogManager.Setup().LoadConfigurationFromFile("nlog.config").GetCurrentClassLogger();
 logger.Info("Starting the application...");
 
@@ -29,6 +30,7 @@ try
     builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SMTP"));
     builder.Services.AddScoped<EmailService>();
     builder.Services.AddScoped<ResetTokenHelper>();
+    builder.Services.AddScoped<RedisCacheHelper>();
     builder.Services.AddScoped<IGreetingRL, GreetingRL>();
     builder.Services.AddScoped<IGreetingBL, GreetingBL>();
     builder.Services.AddScoped<IUserRL, UserRL>();
@@ -98,6 +100,23 @@ try
 
     builder.Services.AddAuthorization();
 
+
+    builder.Services.AddStackExchangeRedisCache(options =>
+    {
+        options.Configuration = builder.Configuration["Redis:ConnectionString"];
+    });
+
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("AllowAllOrigins", policy =>
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        });
+    });
+
+
     var app = builder.Build();
 
     if (app.Environment.IsDevelopment())
@@ -110,6 +129,7 @@ try
     app.UseAuthentication();
     app.UseAuthorization();
     app.MapControllers();
+    app.UseCors("AllowAllOrigins");
 
     app.Run();
 }
