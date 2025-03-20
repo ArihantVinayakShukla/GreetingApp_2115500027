@@ -1,7 +1,8 @@
 ﻿using BusinessLayer.Interface;
 using ModelLayer.DTO;
-using RepositoryLayer.Entity;
 using RepositoryLayer.Interface;
+using System;
+using System.Threading.Tasks;
 
 namespace BusinessLayer.Service
 {
@@ -14,12 +15,11 @@ namespace BusinessLayer.Service
             _userRL = userRL;
         }
 
-        // Register a new user
-        public UserDTO Register(RegisterDTO registerDTO)
+        public async Task<UserDTO> Register(RegisterDTO registerDTO)
         {
             try
             {
-                var userDTO = _userRL.Register(registerDTO);
+                var userDTO = await _userRL.Register(registerDTO);
 
                 if (userDTO == null)
                 {
@@ -34,13 +34,13 @@ namespace BusinessLayer.Service
             }
         }
 
-        public string Login(LoginDTO loginDTO)
+        public async Task<string> Login(LoginDTO loginDTO)
         {
             try
             {
-                var token = _userRL.Login(loginDTO);
+                var token = await _userRL.Login(loginDTO);
 
-                if (token == null)
+                if (string.IsNullOrEmpty(token))
                 {
                     throw new Exception("Invalid email or password.");
                 }
@@ -53,11 +53,11 @@ namespace BusinessLayer.Service
             }
         }
 
-        public bool ForgotPassword(string email)
+        public async Task<bool> ForgotPassword(string email)
         {
             try
             {
-                return _userRL.ForgotPassword(email);
+                return await _userRL.ForgotPassword(email);
             }
             catch (Exception ex)
             {
@@ -65,11 +65,11 @@ namespace BusinessLayer.Service
             }
         }
 
-        public bool ResetPassword(string token, string newPassword)
+        public async Task<bool> ResetPassword(string token, string newPassword)
         {
             try
             {
-                return _userRL.ResetPassword(token, newPassword);
+                return await _userRL.ResetPassword(token, newPassword);
             }
             catch (Exception ex)
             {
